@@ -1,0 +1,420 @@
+2.1 = bot เก็บ data ต่อ
+- bot/main.py
+- bot/data/signal_data.csv
+- bot/data/result_data.csv
+======================================================================
+ ผลลัพที่ได้ data  
+signal_data.csv
+result_data.csv
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ไป 2.2
+
+===================================================================
+2.2 = analyzer แยกต่างหาก
+- analysis/v1_overview.py
+- analysis/v2_trend_zone.py
+- analysis/v3_mtf.py
+- analysis/v4_volume_momentum.py
+- analysis/v5_coin_behavior.py
+
+2.2 อ่าน data จาก 2.1 เท่านั้น
+ห้ามเขียนทับ
+ห้ามแก้ signal_data.csv
+ห้ามแก้ result_data.csv
+==================================================================
+ผลลัพที่ได้ เอามาวิเคาะห์ต่อ 2.3
+
+analysis/summary_2_2.txt
+analysis/edge_report.csv
+analysis/bad_setup_report.csv
+analysis/filter_candidate.csv
+
+summary_2_2.txt
+= สรุปภาษาคนว่าเจออะไร
+
+edge_report.csv
+= setup ที่ winrate ดี
+
+bad_setup_report.csv
+= setup ที่ควรเลี่ยง
+
+filter_candidate.csv
+= เงื่อนไขที่อาจเอาไปทำ filter ใน >>>>>>>>>>>>>>>>>>>>>.>>>2.3
+
+ข้อสรุปจาก 2.2
+ไม่ใช่เอา code analyzer ไปยัดใน bot
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>= เงื่อนไขที่อาจเอาไปทำ filter ใน >>>>>>>>>>>>>>>>>>>>>.>>>2.3
+=========================================================================================================
+
+2.3 = copy 2.1 → ล้าง CSV → เพิ่ม logic จาก 2.2 → เริ่ม row 0 ใหม่ >>>>เอาข้อสรุปจาก 2.2 มาสร้าง bot/dataset รุ่นใหม่<<<<<
+PHASE 2.3 = FILTERED / STRUCTURED DATASET DEVELOPMENT
+
+========================================================
+2.3 เป้าหมาย
+========================================================
+
+เอาผลวิเคราะห์จาก 2.2
+มาสร้าง bot/dataset รุ่นใหม่ที่ “ฉลาดขึ้น”
+
+2.3 ไม่ใช่ AI
+2.3 คือ:
+- filter
+- classification
+- market structure
+- quality labeling
+- clean dataset generation
+
+========================================================
+2.3 หลักสำคัญ
+========================================================
+
+1. copy stable code จาก 2.1
+2. ไม่แก้ทับ 2.1
+3. signal_data.csv / result_data.csv เริ่ม row 0 ใหม่
+4. ใช้ insight จาก 2.2 เท่านั้น
+5. ไม่เอา analyzer code จาก 2.2 มายัดใน bot
+6. ใช้ “ข้อสรุป” จาก 2.2 ไปสร้าง logic ใหม่
+
+========================================================
+2.3 สิ่งที่เพิ่ม
+========================================================
+
+------------------------------
+2.3.1 FILTER
+------------------------------
+
+ตัวอย่าง:
+- mtf_align filter
+- trend clarity filter
+- volume filter
+- sideway skip
+- volatility filter
+- btc behavior filter
+
+สิ่งที่เพิ่มใน signal_data.csv:
+- filter_pass
+- skip_reason
+
+------------------------------
+2.3.2 MARKET MODE
+------------------------------
+
+market_mode:
+- trend_up
+- trend_down
+- sideway
+- conflict
+
+เพิ่ม column:
+- market_mode
+
+------------------------------
+2.3.3 PATTERN GROUPING
+------------------------------
+
+pattern_group:
+- support_bounce
+- resistance_reject
+- breakout
+- fake_breakout
+- pullback_continuation
+
+เพิ่ม column:
+- pattern_group
+
+------------------------------
+2.3.4 SIGNAL QUALITY
+------------------------------
+
+signal_quality:
+- A
+- B
+- C
+- trash
+
+เพิ่ม column:
+- signal_quality
+
+========================================================
+2.3 DATASET STRUCTURE
+========================================================
+
+Dataset หลักยังมีแค่:
+
+1. signal_data.csv
+2. result_data.csv
+
+ห้ามแตก CSV ย่อยมั่ว
+
+ข้อมูลใหม่ให้เพิ่มเป็น columns/labels
+
+========================================================
+2.3 ช่วงทดลอง
+========================================================
+
+2.3.1 → 2.3.3:
+- ทดลอง labels ได้
+- เพิ่ม columns ได้
+- ปรับ structure ได้
+- ยัง flexible
+
+แต่:
+- ห้ามมั่วชื่อ field
+- ห้ามแตก CSV มั่ว
+- 1 signal = 1 row เสมอ
+
+========================================================
+2.3.4 FINAL CLEANUP
+========================================================
+
+ทำ:
+- ลบ field ขยะ
+- rename field ให้ชัด
+- จัดกลุ่ม columns
+- clean structure
+- freeze schema
+
+หลัง 2.3.4:
+- ห้ามเพิ่มมั่ว
+- เริ่ม clean long-term dataset จริง
+
+========================================================
+2.3 RESULT / OUTPUT
+========================================================
+
+สิ่งที่ได้จาก 2.3:
+
+1. Filtered Dataset
+2. Structured Dataset
+3. Better Labels
+4. Better Classification
+5. Better Signal Quality
+6. Better Market Context
+7. AI-ready dataset มากขึ้น
+
+========================================================
+2.3 VERSIONING
+========================================================
+
+สามารถมี:
+- 2.3_v1
+- 2.3_v2
+- 2.3_v3
+
+ได้
+
+แต่ละ version:
+- copy stable version ก่อนหน้า
+- มี CSV ของตัวเอง
+- เริ่ม row 0 ใหม่
+- ห้ามแก้ทับ version เก่า
+
+========================================================
+2.3 DATA ENGINEERING RULE
+========================================================
+
+Dataset หลัก:
+- signal_data.csv
+- result_data.csv
+
+Signa
+	--------------------------
+	
+	2.3 อีกตัว
+	
+	
+	PHASE 2.3 = BEHAVIOR MODULE LIBRARY DEVELOPMENT
+
+========================================================
+2.3 เป้าหมาย
+========================================================
+
+สร้าง “คลังสมอง / ห้องสมุด”
+แยกตามพฤติกรรมตลาด
+
+ไม่ใช่หา strategy เดียวเทพ
+
+แต่คือ:
+- แยก behavior
+- แยก modules
+- แยก strategy groups
+- เตรียมระบบให้เลือก strategy ตามตลาด
+
+========================================================
+2.3 แนวคิดหลัก
+========================================================
+
+ตลาดมีหลาย behavior
+
+ดังนั้น:
+ต้องมีหลาย modules
+
+แต่:
+เริ่มจาก “วิชาหลัก”
+ก่อน
+
+เป้าหมาย:
+- อยู่รอด
+- เสถียร
+- maintain ง่าย
+- paper trade ได้จริง
+
+ไม่ใช่:
+- ละเอียดทุก pattern ตั้งแต่แรก
+- ซับซ้อนเกิน data
+
+========================================================
+2.3 โครงสร้างหลัก
+========================================================
+
+เริ่มสร้าง modules หลัก:
+
+1. trend_follow
+2. rebound
+3. breakout
+4. no_trade
+
+========================================================
+2.3.1 MODULE / FILTER EXPERIMENT
+========================================================
+
+เริ่มทดลอง:
+- filter
+- market logic
+- behavior logic
+
+ตัวอย่าง:
+- mtf_align filter
+- volume filter
+- trend clarity filter
+- sideway skip
+- btc behavior filter
+
+เพิ่ม labels:
+- filter_pass
+- skip_reason
+
+ช่วงนี้:
+- ยัง flexible
+- ยังทดลองได้
+- columns ยังเพิ่มได้
+
+แต่:
+- ห้ามมั่วชื่อ field
+- ห้ามแตก CSV มั่ว
+
+========================================================
+2.3.2 MARKET / PATTERN CLASSIFICATION
+========================================================
+
+เริ่มแยก behavior groups
+
+------------------------------
+Market Mode
+------------------------------
+
+- trend_up
+- trend_down
+- sideway
+- conflict
+
+------------------------------
+Pattern Group
+------------------------------
+
+- support_bounce
+- resistance_reject
+- breakout
+- fake_breakout
+- pullback_continuation
+
+เพิ่ม labels:
+- market_mode
+- pattern_group
+- behavior_type
+
+========================================================
+2.3.3 SIGNAL QUALITY / CLEAN STRUCTURE
+========================================================
+
+เริ่มจัด quality
+
+Signal Quality:
+- A
+- B
+- C
+- trash
+
+เพิ่ม labels:
+- signal_quality
+
+เริ่ม:
+- clean columns
+- จัดกลุ่ม columns
+- ลบ field ขยะ
+- rename fields ให้ชัด
+
+แต่:
+ยังไม่ freeze schema จริง
+
+========================================================
+2.3 DATASET RULE
+========================================================
+
+Dataset หลักมีแค่:
+
+1. signal_data.csv
+2. result_data.csv
+
+Signal หนึ่งตัว:
+= หนึ่ง row
+
+ทุก behavior/context:
+= columns / labels
+
+ห้ามแตก CSV ย่อยมั่ว
+
+========================================================
+2.3 การทดลอง
+========================================================
+
+2.3 ยังเป็น “ช่วงทดลอง”
+
+ดังนั้น:
+- เก็บ data ต่อ
+- เริ่ม row 0 ใหม่
+- ใช้ CSV ใหม่
+- แยกจาก 2.1
+
+แนะนำ:
+500–2000 rows ต่อ version
+
+สามารถมี:
+- 2.3_v1
+- 2.3_v2
+- 2.3_v3
+
+ได้
+
+แต่ละ version:
+- copy stable version ก่อนหน้า
+- มี CSV ของตัวเอง
+- ห้ามแก้ทับ version เก่า
+
+========================================================
+2.3 สิ่งที่ได้
+========================================================
+
+1. Filtered Dataset
+2. Structured Dataset
+3. Behavior Modules
+4. Market Classification
+5. Pattern Classification
+6. Signal Quality System
+7. ห้องสมุดกลยุทธ์พื้นฐาน
+
+========================================================
+2.3 เป้าหมายสุดท้าย
+========================================================
+
+สร้าง:
+“

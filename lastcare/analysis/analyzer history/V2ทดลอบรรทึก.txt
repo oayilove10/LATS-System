@@ -1,0 +1,46 @@
+219"}
+PHASE 2.4 – FILTER TEST (V2)
+
+1. DATA COLLECTION (V5)
+- ใช้ main V5 เก็บข้อมูลตลาด
+- เก็บทุก signal (ไม่มี filter)
+- ได้ data ~730–800 samples
+
+2. ANALYSIS (V5)
+- วิเคราะห์ winrate จาก data
+- พบ setup ที่ดี:
+  - down + middle (ดีที่สุด)
+  - down + resistance (พอใช้)
+- setup ที่แย่:
+  - up + middle
+  - up + support
+  - down + support
+
+3. BUILD STRATEGY V2
+- สร้าง strategy_filter.py
+- rule:
+  - ("down", "middle")
+  - ("down", "resistance")
+- ใช้ filter ก่อนบันทึก (PASS เท่านั้น)
+
+4. INTEGRATION
+- ใส่ filter เข้า main.py
+- main V5 ไม่เปลี่ยน logic
+- ระบบรันได้ปกติ
+
+5. CURRENT BEHAVIOR
+- BLOCK เยอะ → signal ลดลง
+- PASS น้อย → data เพิ่มช้า
+- pending เยอะ → ยังไม่สรุปผล
+- done ยังไม่พอวิเคราะห์
+
+6. CURRENT STATUS
+- อยู่ใน Phase: ทดลอง V2 (live)
+- ยังไม่ optimize
+- ยังไม่สร้าง V3
+
+7. NEXT STEP
+- รันต่อ 2–3 วัน
+- รอ V6 done ~100–200 samples
+- วิเคราะห์ใหม่
+- ตัดสินใจทำ V3
