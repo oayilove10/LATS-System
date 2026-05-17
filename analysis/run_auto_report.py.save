@@ -1,0 +1,136 @@
+import os
+import csv
+from datetime import datetime
+from collections import Counter, defaultdict
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+DATA_DIR = os.path.join(BASE_DIR, "bot", "data")
+
+SIGNAL_FILE = os.path.join(DATA_DIR, "signal_data.csv")
+RESULT_FILE = os.path.join(DATA_DIR, "result_data.csv")
+
+OUT_DIR = os.path.join(
+    BASE_DIR,
+    "analysis",
+    "outputs",
+    "weekly",
+    datetime.now().strftime("%Y-%m-%d_%H%M")
+)
+
+os.makedirs(OUT_DIR, exist_ok=True)
+
+
+def read_csv(path):
+    if not os.path.isfile(path):
+        return []
+
+    with open(path, "r", encoding="utf-8") as f:
+        return list(csv.DictReader(f))
+
+
+def count_by(rows, field):
+    c = Counter()
+    for r in rows:
+        value = r.get(field, "") or "EMPTY"
+        c[value] += 1
+    return c
+
+
+def write_txt(filename, lines):
+    path = os.path.join(OUT_DIR, filename)
+    with open(path, "w", encoding="utf-8") as f:
+        f.write("\n".join(lines))
+
+
+def main():
+    signals = read_csv(SIGNAL_FILE)
+    results = read_csv(RESULT_FILE)
+
+    overview = []
+    overview.append("LATS AUTO ANALYSIS REPORT")
+    overview.append("=" * 40)
+    overview.append(f"Generated at: {datetime.now()}")
+    overview.append("")
+    overview.append(f"Total signals: {len(signals)}")
+    overview.append(f"Total results: {len(results)}")
+    overview.append("")
+
+    overview.append("STATUS")
+    overview.append("-" * 20)
+    for k, v in count_by(results, "status").most_common():
+        overview.append(f"{k}: {v}")
+
+    overview.append("")
+    overview.append("SIGNAL TYPE")
+    overview.append("-" * 20)
+    for k, v in count_by(signals, "signal_type").most_common():
+        overview.append(f"{k}: {v}")
+
+    overview.append("")
+    overview.append("TREND 15M")
+    overview.append("-" * 20)
+    for k, v in count_by(signals, "trend_15m").most_common():
+        overview.append(f"{k}: {v}")
+
+    overview.append("")
+    overview.append("TREND 1H")
+    overview.append("-" * 20)
+    for k, v in count_by(signals, "trend_1h").most_common():
+        overview.append(f"{k}: {v}")
+
+    overview.append("")
+    overview.append("TREND 4H")
+    overview.append("-" * 20)
+    for k, v in count_by(signals, "trend_4h").most_common():
+        overview.append(f"{k}: {v}")
+
+    overview.append("")
+    overview.append("MTF ALIGN")
+    overview.append("-" * 20)
+    for k, v in count_by(signals, "mtf_align").most_common():
+        overview.append(f"{k}: {v}")
+
+    overview.append("")
+    overview.append("ZONE")
+    overview.append("-" * 20)
+    for k, v in count_by(signals, "zone").most_common():
+        overview.append(f"{k}: {v}")
+
+    overview.append("")
+    overview.append("COIN BEHAVIOR")
+    overview.append("-" * 20)
+    for k, v in count_by(signals, "coin_behavior").most_common():
+        overview.append(f"{k}: {v}")
+
+    write_txt("01_overview.txt", overview)
+
+    coin_lines = []
+    coin_lines.append("COIN SUMMARY")
+    coin_lines.append("=" * 40)
+
+    by_coin = defaultdict(int)
+    for r in signals:
+        by_coin[r.get("symbol", "EMPTY")] += 1
+
+    for coin, count in sorted(by_coin.items(), key=lambda x: x[1], reverse=True):
+        coin_lines.append(f"{coin}: {count}")
+
+    write_txt("02_coin_summary.txt", coin_lines)
+
+    warning = []
+    warning.append("WARNING / THINGS TO CHECK")
+    warning.append("=" * 40)
+    warning.append("- Check if high signal count comes from repeated behavior")
+    warning.append("- Check if one coin dominates too much")
+    warning.append("- Check if mtf_align conflict increases")
+    warning.append("- Check if pending result grows too much")
+    warning.append("- Check if coin_behavior changes from follow_btc to against_btc")
+
+    write_txt("03_warning_checklist.txt", warning)
+
+    print("Auto report generated:")
+    print(OUT_DIR)
+
+
+if __name__ == "__main__":
+    main()
