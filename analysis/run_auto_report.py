@@ -7,6 +7,7 @@ from collections import Counter, defaultdict
 # LATS AUTO ANALYSIS REPORT V6
 # 1 run = 1 folder
 # include context-aware signal chain quality
+# reports 01-10
 # =========================
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -82,7 +83,10 @@ def get_result_value(result_row, field):
 
 
 def calc_winrate(records, result_field):
-    counter = Counter(r.get(result_field, "EMPTY") or "EMPTY" for r in records)
+    counter = Counter(
+        r.get(result_field, "EMPTY") or "EMPTY"
+        for r in records
+    )
 
     win = counter.get("win", 0)
     loss = counter.get("loss", 0)
@@ -298,6 +302,8 @@ def build_valid_signal_rows(signals):
         valid.append(row)
 
     return valid
+
+
 def report_signal_chain(signals):
     lines = []
     lines.append("LATS AUTO ANALYSIS REPORT")
@@ -383,8 +389,6 @@ def report_signal_chain(signals):
     lines.extend(per_coin_lines)
 
     write_txt(DAILY_DIR, "07_signal_chain_report.txt", lines)
-
-
 def report_signal_chain_quality(signals, results):
     lines = []
     lines.append("LATS AUTO ANALYSIS REPORT")
@@ -517,6 +521,319 @@ def report_signal_chain_quality(signals, results):
     )
 
 
+def report_runtime_data_integrity(signals, results):
+    lines = []
+
+    lines.append("LATS AUTO ANALYSIS REPORT")
+    lines.append("REPORT: 09 RUNTIME / DATA INTEGRITY ANALYSIS")
+    lines.append(f"DATE: {RUN_DATE}")
+    lines.append("=" * 50)
+
+    signal_ids = set()
+    duplicate_signal_ids = 0
+    empty_signal_ids = 0
+
+    for s in signals:
+        sid = s.get("signal_id")
+
+        if not sid:
+            empty_signal_ids += 1
+            continue
+
+        if sid in signal_ids:
+            duplicate_signal_ids += 1
+
+        signal_ids.add(sid)
+
+    result_signal_ids = set(
+        r.get("signal_id")
+        for r in results
+        if r.get("signal_id")
+    )
+
+    missing_results = 0
+
+    for sid in signal_ids:
+        if sid not in result_signal_ids:
+            missing_results += 1
+
+    valid = build_valid_signal_rows(signals)
+
+    by_symbol = defaultdict(list)
+
+    for row in valid:
+        by_symbol[row.get("symbol", "EMPTY")].append(row)
+
+    big_gap_count = 0
+    time_reverse_count = 0
+    gap_records = []
+
+    for symbol, rows in by_symbol.items():
+
+        rows.sort(key=lambda x: x["_time"])
+
+        for i in range(1, len(rows)):
+
+            prev = rows[i - 1]
+            curr = rows[i]
+
+            gap_ms = curr["_time"] - prev["_time"]
+            gap_minutes = gap_ms / 1000 / 60
+
+            if gap_ms < 0:
+                time_reverse_count += 1
+
+            if gap_minutes > 60:
+                big_gap_count += 1
+                gap_records.append(
+                    (
+                        symbol,
+                        prev.get("signal_id", "EMPTY"),
+                        curr.get("signal_id", "EMPTY"),
+                        gap_minutes,
+                    )
+                )
+
+    pending_rows = count_status(results, "pending")
+    done_rows = count_status(results, "done")
+
+    lines += section("SUMMARY")
+
+    lines.append(f"Signal rows: {len(signals)}")
+    lines.append(f"Result rows: {len(results)}")
+    lines.append(f"Done rows: {done_rows}")
+    lines.append(f"Pending rows: {pending_rows}")
+
+    lines += section("DATA CHECK")
+
+    lines.append(f"Empty signal_id count: {empty_signal_ids}")
+    lines.append(f"Duplicate signal_id count: {duplicate_signal_ids}")
+    lines.append(f"Missing result rows: {missing_results}")
+    lines.append(f"Large signal gaps (>60m): {big_gap_count}")
+    lines.append(f"Time reverse detected: {time_reverse_count}")
+
+    lines += section("LARGE GAP SAMPLE")
+
+    if gap_records:
+        for item in gap_records[:50]:
+            symbol, prev_id, curr_id, gap_minutes = item
+            lines.append(
+                f"{symbol}: "
+                f"prev={prev_id}, "
+                f"curr={curr_id}, "
+                f"gap_min={gap_minutes:.2f}"
+            )
+    else:
+        lines.append("No large gap sample")
+
+    lines += section("HEALTH CHECK")
+
+    if empty_signal_ids > 0:
+        lines.append("WARNING: empty signal_id detected")
+
+    if duplicate_signal_ids > 0:
+        lines.append("WARNING: duplicate signal_id detected")
+
+    if missing_results > 0:
+        lines.append("WARNING: missing result rows detected")
+
+    if big_gap_count > 0:
+        lines.append("WARNING: possible collector/API/runtime interruption")
+
+    if time_reverse_count > 0:
+        lines.append("WARNING: signal timeline corruption detected")
+
+    if (
+        empty_signal_ids == 0
+        and duplicate_signal_ids == 0
+        and missing_results == 0
+        and big_gap_count == 0
+        and time_reverse_count == 0
+    ):
+        lines.append("System integrity looks healthy")
+
+    lines += section("INTERPRETATION")
+
+    lines.append("Large gaps may indicate API/internet/runtime failure")
+    lines.append("Duplicate signal_id may corrupt analysis")
+    lines.append("Pending rows growing too much may indicate update failure")
+    lines.append("Time reverse may indicate broken timestamp ordering")
+    lines.append("Missing result rows means signal_data and result_data are not fully matched")
+
+    write_txt(
+        DAILY_DIR,
+        "09_runtime_data_integrity.txt",
+        lines
+    )
+
+
+def report_execution_quality_noise(signals, results):
+
+    lines = []
+
+    lines.append("LATS AUTO ANALYSIS REPORT")
+    lines.append("REPORT: 10 EXECUTION QUALITY / NOISE ANALYSIS")
+    lines.append(f"DATE: {RUN_DATE}")
+    lines.append("=" * 50)
+
+    result_map = {
+        r.get("signal_id"): r
+        for r in results
+        if r.get("signal_id")
+    }
+
+    groups = defaultdict(list)
+
+    for s in signals:
+
+        sid = s.get("signal_id")
+
+        result_row = result_map.get(sid)
+
+        if not result_row:
+            continue
+
+        if result_row.get("status", "").lower() != "done":
+            continue
+
+        trend_4h = s.get("trend_4h", "EMPTY")
+        zone = s.get("zone", "EMPTY")
+        mtf_align = s.get("mtf_align", "EMPTY")
+
+        key = (
+            trend_4h,
+            zone,
+            mtf_align
+        )
+
+        groups[key].append({
+            "result_3": get_result_value(result_row, "result_3"),
+            "result_5": get_result_value(result_row, "result_5"),
+            "result_10": get_result_value(result_row, "result_10"),
+            "result_15": get_result_value(result_row, "result_15"),
+            "result_30": get_result_value(result_row, "result_30"),
+        })
+
+    lines += section("SUMMARY")
+
+    lines.append(
+        "This report checks noisy vs clean execution behavior"
+    )
+
+    lines.append(
+        "Weak short-term performance may indicate noisy market behavior"
+    )
+
+    sorted_groups = sorted(
+        groups.items(),
+        key=lambda x: len(x[1]),
+        reverse=True
+    )
+
+    for key, records in sorted_groups[:80]:
+
+        if len(records) < 20:
+            continue
+
+        trend_4h, zone, mtf_align = key
+
+        lines += section(
+            f"trend_4h={trend_4h} | "
+            f"zone={zone} | "
+            f"mtf_align={mtf_align}"
+        )
+
+        lines.append(f"sample_size: {len(records)}")
+
+        winrates = {}
+
+        for field in [
+            "result_3",
+            "result_5",
+            "result_10",
+            "result_15",
+            "result_30",
+        ]:
+
+            win, loss, empty, total, winrate = calc_winrate(
+                records,
+                field
+            )
+
+            if total <= 0:
+                lines.append(f"{field}: no valid rows")
+                continue
+
+            winrates[field] = winrate
+
+            lines.append(
+                f"{field}: "
+                f"win={win}, "
+                f"loss={loss}, "
+                f"empty={empty}, "
+                f"winrate={winrate:.2f}%"
+            )
+
+        r3 = winrates.get("result_3")
+        r10 = winrates.get("result_10")
+        r30 = winrates.get("result_30")
+
+        lines += section("NOISE CLASSIFICATION")
+
+        if r3 is not None and r10 is not None:
+
+            if r3 < 45 and r10 > 55:
+                lines.append(
+                    "Possible noisy start -> later continuation"
+                )
+
+            elif r3 > 55 and r10 < 45:
+                lines.append(
+                    "Possible fake breakout / weak continuation"
+                )
+
+            elif r3 < 45 and r10 < 45:
+                lines.append(
+                    "Possible high noise / weak edge environment"
+                )
+
+            elif r3 > 60 and r10 > 60:
+                lines.append(
+                    "Possible clean continuation environment"
+                )
+
+            else:
+                lines.append(
+                    "Mixed behavior / needs more samples"
+                )
+
+        if r10 is not None and r30 is not None:
+
+            if r10 > 55 and r30 < 45:
+                lines.append(
+                    "Possible late failure / trend decay"
+                )
+
+            elif r10 < 45 and r30 > 55:
+                lines.append(
+                    "Possible slow continuation / delayed reaction"
+                )
+
+    lines += section("INTERPRETATION")
+
+    lines.append("Low result_3 but strong result_10 may indicate noise then continuation")
+    lines.append("Strong result_3 but weak later results may indicate fake breakout")
+    lines.append("Strong short and long window performance suggests clean trend continuation")
+    lines.append("Weak result_10/result_30 may indicate poor follow-through")
+    lines.append("Use this report to classify noisy vs clean market structure")
+
+    write_txt(
+        DAILY_DIR,
+        "10_execution_quality_noise.txt",
+        lines
+    )
+
+
 def report_compare_placeholder():
     lines = []
     lines.append("LATS AUTO ANALYSIS REPORT")
@@ -565,12 +882,16 @@ def report_weekly_summary(signals, results):
     lines.append("- 06_winrate_by_window.txt")
     lines.append("- 07_signal_chain_report.txt")
     lines.append("- 08_signal_chain_quality.txt")
+    lines.append("- 09_runtime_data_integrity.txt")
+    lines.append("- 10_execution_quality_noise.txt")
 
     lines += section("NEXT")
 
     lines.append("- Review continuation vs reversal behavior")
     lines.append("- Review LONG_TO_SHORT in strong_up")
     lines.append("- Review SAME_DIRECTION continuation quality")
+    lines.append("- Review runtime/data integrity before trusting analysis")
+    lines.append("- Review noisy vs clean market behavior")
     lines.append("- Do not add new fields until analysis proves it is needed")
 
     write_txt(
@@ -594,6 +915,16 @@ def main():
     report_signal_chain(signals)
 
     report_signal_chain_quality(
+        signals,
+        results
+    )
+
+    report_runtime_data_integrity(
+        signals,
+        results
+    )
+
+    report_execution_quality_noise(
         signals,
         results
     )
