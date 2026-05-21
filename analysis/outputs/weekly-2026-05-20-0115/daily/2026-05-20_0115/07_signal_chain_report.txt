@@ -1,0 +1,25 @@
+LATS AUTO ANALYSIS REPORT
+REPORT: 07 SIGNAL CHAIN ANALYSIS
+DATE: 2026-05-20
+==================================================
+
+==================================================
+SUMMARY
+==================================================
+Valid long/short signals used: 0
+Total signal chains: 0
+Long -> Short chains: 0
+Short -> Long chains: 0
+Same direction chains: 0
+Average gap between signals: 0.00 minutes
+
+==================================================
+INTERPRETATION
+==================================================
+Long -> Short = possible exit / pause after long
+Short -> Long = possible exit / pause after short
+Same direction = continuation / repeated signal
+
+==================================================
+BY COIN
+==================================================

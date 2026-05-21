@@ -1,0 +1,18 @@
+LATS AUTO ANALYSIS REPORT
+REPORT: 08 SIGNAL CHAIN QUALITY
+DATE: 2026-05-20
+==================================================
+
+==================================================
+SUMMARY
+==================================================
+Context-aware signal chain quality analysis
+This checks which context creates better continuation or reversal behavior
+
+==================================================
+INTERPRETATION
+==================================================
+LONG_TO_SHORT in strong_up may represent pause more than reversal.
+LONG_TO_SHORT at resistance may create stronger exit quality.
+SAME_DIRECTION high winrate suggests continuation behavior.
+Use this report to classify pause vs reversal behavior.

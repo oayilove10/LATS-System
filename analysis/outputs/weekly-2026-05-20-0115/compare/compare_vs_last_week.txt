@@ -1,0 +1,10 @@
+LATS AUTO ANALYSIS REPORT
+COMPARE PLACEHOLDER
+DATE: 2026-05-20
+==================================================
+Future:
+- compare this week vs last week
+- changed behavior
+- unchanged behavior
+- increased / decreased setup group
+- coin behavior shift

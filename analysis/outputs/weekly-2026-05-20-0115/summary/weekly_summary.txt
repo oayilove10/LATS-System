@@ -1,0 +1,33 @@
+LATS AUTO ANALYSIS REPORT
+WEEKLY SUMMARY
+DATE: 2026-05-20
+RUN_FOLDER: /home/tong/LATS-System_Github/analysis/outputs/weekly-2026-05-20-0115
+==================================================
+Total signal rows: 0
+Total result rows: 0
+Done result rows: 0
+Pending result rows: 0
+
+==================================================
+GENERATED REPORTS
+==================================================
+- 01_overview.txt
+- 02_coin_summary.txt
+- 03_trend_summary.txt
+- 04_behavior_summary.txt
+- 05_warning_checklist.txt
+- 06_winrate_by_window.txt
+- 07_signal_chain_report.txt
+- 08_signal_chain_quality.txt
+- 09_runtime_data_integrity.txt
+- 10_execution_quality_noise.txt
+
+==================================================
+NEXT
+==================================================
+- Review continuation vs reversal behavior
+- Review LONG_TO_SHORT in strong_up
+- Review SAME_DIRECTION continuation quality
+- Review runtime/data integrity before trusting analysis
+- Review noisy vs clean market behavior
+- Do not add new fields until analysis proves it is needed

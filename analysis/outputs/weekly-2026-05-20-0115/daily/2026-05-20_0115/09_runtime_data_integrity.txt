@@ -1,0 +1,40 @@
+LATS AUTO ANALYSIS REPORT
+REPORT: 09 RUNTIME / DATA INTEGRITY ANALYSIS
+DATE: 2026-05-20
+==================================================
+
+==================================================
+SUMMARY
+==================================================
+Signal rows: 0
+Result rows: 0
+Done rows: 0
+Pending rows: 0
+
+==================================================
+DATA CHECK
+==================================================
+Empty signal_id count: 0
+Duplicate signal_id count: 0
+Missing result rows: 0
+Large signal gaps (>60m): 0
+Time reverse detected: 0
+
+==================================================
+LARGE GAP SAMPLE
+==================================================
+No large gap sample
+
+==================================================
+HEALTH CHECK
+==================================================
+System integrity looks healthy
+
+==================================================
+INTERPRETATION
+==================================================
+Large gaps may indicate API/internet/runtime failure
+Duplicate signal_id may corrupt analysis
+Pending rows growing too much may indicate update failure
+Time reverse may indicate broken timestamp ordering
+Missing result rows means signal_data and result_data are not fully matched

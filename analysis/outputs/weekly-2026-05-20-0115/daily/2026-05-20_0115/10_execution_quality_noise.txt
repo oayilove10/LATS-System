@@ -1,0 +1,19 @@
+LATS AUTO ANALYSIS REPORT
+REPORT: 10 EXECUTION QUALITY / NOISE ANALYSIS
+DATE: 2026-05-20
+==================================================
+
+==================================================
+SUMMARY
+==================================================
+This report checks noisy vs clean execution behavior
+Weak short-term performance may indicate noisy market behavior
+
+==================================================
+INTERPRETATION
+==================================================
+Low result_3 but strong result_10 may indicate noise then continuation
+Strong result_3 but weak later results may indicate fake breakout
+Strong short and long window performance suggests clean trend continuation
+Weak result_10/result_30 may indicate poor follow-through
+Use this report to classify noisy vs clean market structure

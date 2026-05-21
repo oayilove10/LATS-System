@@ -1,0 +1,17 @@
+LATS AUTO ANALYSIS REPORT
+REPORT: 05 WARNING CHECKLIST
+DATE: 2026-05-20
+==================================================
+Done result rows: 0
+Pending result rows: 0
+MTF conflict signal rows: 0
+
+==================================================
+THINGS TO CHECK
+==================================================
+- Check if pending result rows are growing too much
+- Check if one coin dominates too much
+- Check if MTF conflict increases
+- Check if coin_behavior changes
+- Check if high score / strong trend starts failing later
+- Check if repeated behavior is becoming too duplicated
